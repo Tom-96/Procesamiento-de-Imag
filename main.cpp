@@ -51,38 +51,13 @@ cv::Mat Transform(cv::Mat img, float gamma, int f[4], int c[3])
     
     imgT = CvScalar(c[0],c[1],c[2]);
 
-    cv::cvtColor(imgT, imgT, cv::COLOR_BGR2YCrCb);
+    cv::cvtColor(imgT, imgT, cv::COLOR_RGB2YCrCb);
 
     cv::Mat roiT(imgT, cvRect(f[0],f[1],f[2],f[3]));
 
     roi.copyTo(roiT);
-
-    /*
-    cv::Mat R;
-
-    roi.copyTo(R);
-
-    imgYUV = CvScalar(0,0,0);
-
-    cv::Mat mask;
-
-    imgYUV.copyTo(mask);
-
-    mask = CvScalar(0,0,0);
-
-    cv::Mat roiMask(mask, cvRect(f[0],f[1],f[2],f[3]));
-
-    roi.copyTo(roiMask);
-
-    R.copyTo(imgT,mask);*/
     
     cv::cvtColor(imgT, imgT, cv::COLOR_YCrCb2BGR);
-
-    //imgYUV.copyTo(imgT);
-
-    //imgT = CvScalar(0,255,0);
-
-    
 
     delete t;
 
@@ -119,21 +94,50 @@ int main(int argc, char *argv[])
                 if (argc > 9)
                     if (argv[9][1] == 'c') for (int i=0;i<3;i++) c[i] = atoi(argv[10+i]);
             }
-            if (argv[4][1] == 'c') for (int i=0;i<3;i++) c[i] = atoi(argv[4+i]);
+            if (argv[4][1] == 'c') for (int i=0;i<3;i++) c[i] = atoi(argv[5+i]);
         }
     }
 
     else if (method[1] == 'v')
     {
+        cv::VideoCapture cap;
+        // open the default camera, use something different from 0 otherwise;
+        // Check VideoCapture documentation.
+        if(!cap.open(0))
+        {
+            std::cout << "no se pudo abrir webcam" << std::endl;
+            return 0;
+        }
+        for(;;)
+        {
+            cap >> img;
+            if( img.empty() ) break; // end of video stream
+            imshow("this is you, smile! :)", img);
+            std::cout << "pulse ESC para detener la captura" << std::endl;
+            if( cv::waitKey(10) == 27 ) break; // stop capturing by pressing ESC 
+        }
+        // the camera will be closed automatically upon exit
+        // cap.close();
 
+        gamma = atof(argv[2]);
+
+        if (argc > 3)
+        {
+            if (argv[3][1] == 'f') 
+            {
+                for (int i=0;i<4;i++) f[i] = atoi(argv[4+i]);
+                if (argc > 8)
+                    if (argv[8][1] == 'c') for (int i=0;i<3;i++) c[i] = atoi(argv[9+i]);
+            }
+            if (argv[3][1] == 'c') for (int i=0;i<3;i++) c[i] = atoi(argv[4+i]);
+        }
     }
+
     cv::Mat imgT = Transform(img, gamma, f, c);
 
     cv::imshow("input", imgT);
 
     cv::waitKey(0);
-
-    
 
     return 1;
 }
