@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 
+//funcion que obtiene la tabla de transformacion segun el operador
 float* getTransformTable(int a, int b)
 {
     float *preCalculatedTable = new float[256];
@@ -32,6 +33,7 @@ void funcion(cv::Mat I, int a, int b)
 
     cv::cvtColor(I, imgYUV, cv::COLOR_BGR2YCrCb);
 
+    //tabla de transformacion
     float *t = getTransformTable(a, b);
 
     for (int i=0;i<imgYUV.rows;i++)
